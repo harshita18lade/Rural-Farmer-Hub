@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<h3 class="mb-4">Farmer Portal - {{ session.get('name') }}</h3>
+
+<div class="row g-4">
+    <!-- Sell Produce Form -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Post Crops/Vegetables for Sale</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="action" value="add_crop">
+                    <div class="mb-2">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Grains">Grains & Pulses</option>
+                            <option value="Fruits">Fruits</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Produce Name</label>
+                        <input type="text" name="crop_name" class="form-control" placeholder="e.g. Organic Tomatoes" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Available Quantity (Kg)</label>
+                            <input type="number" name="quantity" class="form-control" required>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Price per Kg (₹)</label>
+                            <input type="number" name="price" class="form-control" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 mt-2">Publish Produce Listing</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Smart Advisory -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Smart Market Advisory</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="action" value="get_recommendation">
+                    <div class="mb-2">
+                        <label class="form-label">Water Source</label>
+                        <select name="water_source" class="form-select">
+                            <option value="rainfed">Rain-fed</option>
+                            <option value="irrigation">Well / Borewell</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-info text-white w-100">Check Recommended Crops</button>
+                </form>
+                {% if recommendation %}
+                    <div class="alert alert-light border mt-3 mb-0">{{ recommendation }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <!-- Active Produce -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">My Listed Produce</h5>
+            </div>
+            <div class="card-body">
+                {% if farmer_crops %}
+                    <ul class="list-group">
+                        {% for item in farmer_crops %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ item.name }}</strong> ({{ item.category }})<br>
+                                    <small class="text-muted">Stock: {{ item.quantity }} kg</small>
+                                </div>
+                                <span class="badge bg-success rounded-pill">₹{{ item.price }}/kg</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">You have not listed any produce yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Restaurant Direct Requirements -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Restaurant Bulk Purchase Requests</h5>
+            </div>
+            <div class="card-body">
+                {% if buy_requests %}
+                    <div class="list-group">
+                        {% for req in buy_requests %}
+                            <div class="list-group-item">
+                                <h6><strong>{{ req.restaurant }}</strong> needs <strong>{{ req.item_needed }}</strong></h6>
+                                <p class="mb-1 text-muted">Quantity Needed: {{ req.quantity_needed }} kg ({{ req.category }})</p>
+                                <span class="badge bg-warning text-dark">{{ req.credit_term }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No restaurant requirements posted yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
